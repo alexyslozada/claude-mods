@@ -1,0 +1,8 @@
+{
+  "name": "mis-notas",
+  "version": "0.1.0",
+  "description": "Guarda notas con /nota y Claude las usa como tu contexto y tus preferencias en todas las sesiones",
+  "author": {
+    "name": "alexyslozada"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "name": "viernes-sin-deploy",
+  "version": "0.1.0",
+  "description": "Bloquea git push los viernes. Los viernes no se hace deploy 🍻",
+  "author": {
+    "name": "alexyslozada"
+  }
+}

@@ -1,0 +1,9 @@
+# Configuración local de Claude Code
+.claude/
+
+# Generados por Claude Code al cargar cada mod
+plugins/*/.claude-plugin/types/
+plugins/*/tsconfig.json
+
+node_modules/
+.DS_Store

@@ -1,0 +1,9 @@
+{
+  "name": "aprobar-dependencias",
+  "version": "0.2.0",
+  "description": "Pide tu aprobación antes de que Claude instale cualquier paquete y muestra el historial en una franja",
+  "types": "./types/index.d.ts",
+  "author": {
+    "name": "alexyslozada"
+  }
+}

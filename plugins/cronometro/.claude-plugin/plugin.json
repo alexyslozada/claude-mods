@@ -1,0 +1,8 @@
+{
+  "name": "cronometro",
+  "version": "0.1.0",
+  "description": "Mide cuánto tarda cada turno y cuántas herramientas usa Claude",
+  "author": {
+    "name": "alexyslozada"
+  }
+}

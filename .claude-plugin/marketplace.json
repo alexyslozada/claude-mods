@@ -1,0 +1,29 @@
+{
+  "name": "claude-mods",
+  "description": "Mods de ejemplo para Claude Code, en español",
+  "owner": {
+    "name": "alexyslozada"
+  },
+  "plugins": [
+    {
+      "name": "cronometro",
+      "source": "./plugins/cronometro",
+      "description": "Muestra cuánto tarda cada turno y cuántas herramientas usa Claude"
+    },
+    {
+      "name": "viernes-sin-deploy",
+      "source": "./plugins/viernes-sin-deploy",
+      "description": "Bloquea git push los viernes 🍻"
+    },
+    {
+      "name": "aprobar-dependencias",
+      "source": "./plugins/aprobar-dependencias",
+      "description": "Pide tu aprobación antes de instalar paquetes y muestra el historial en una franja"
+    },
+    {
+      "name": "mis-notas",
+      "source": "./plugins/mis-notas",
+      "description": "Guarda notas con /nota y Claude las usa como tu contexto y preferencias"
+    }
+  ]
+}
