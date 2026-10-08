@@ -1,6 +1,6 @@
 import type { Register } from 'claude-code'
 
-const VIERNES = 5 // 0 = domingo, 1 = lunes … 5 = viernes
+const VIERNES = 3 // 0 = domingo, 1 = lunes … 5 = viernes
 const GIT_PUSH = /\bgit\s+push\b/
 
 export const register: Register = on => {
