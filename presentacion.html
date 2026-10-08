@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mods de Claude Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #faf9f6; --fg: #1d1c1a; --muted: #6b6760; --card: #ffffff; --line: #e4e1da;
+  --accent: #c8553d; --accent-soft: #f6e3dd; --ok: #2f7d4f; --bad: #b3261e;
+  --code-bg: #1e1e24; --code-fg: #e8e6e1; --c-key: #ff9e7a; --c-str: #a6d189; --c-com: #8a8f98; --c-fn: #8caaee;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #16161a; --fg: #eceae5; --muted: #a09c94; --card: #202026; --line: #33333b;
+    --accent: #ff8a65; --accent-soft: #3a2620; --ok: #7bd389; --bad: #ff7a70; --code-bg: #0f0f13;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #16161a; --fg: #eceae5; --muted: #a09c94; --card: #202026; --line: #33333b;
+  --accent: #ff8a65; --accent-soft: #3a2620; --ok: #7bd389; --bad: #ff7a70; --code-bg: #0f0f13;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--fg); font-family: Inter, system-ui, sans-serif; overflow: hidden; }
+
+.slide {
+  position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center;
+  padding: 48px max(16px, 7vw) 72px; overflow-y: auto;
+}
+.slide.on { display: flex; animation: entra .25s ease; }
+@keyframes entra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+h1 { font-size: clamp(36px, 6vw, 72px); line-height: 1.05; margin: 0 0 16px; letter-spacing: -0.02em; }
+h2 { font-size: clamp(26px, 3.6vw, 44px); margin: 0 0 24px; letter-spacing: -0.01em; }
+h3 { font-size: 20px; margin: 0 0 8px; }
+p, li { font-size: clamp(17px, 1.6vw, 22px); line-height: 1.5; }
+.muted { color: var(--muted); }
+.kicker { color: var(--accent); font-weight: 600; text-transform: uppercase; letter-spacing: .08em; font-size: 14px; margin-bottom: 12px; }
+.big { font-size: clamp(22px, 2.4vw, 30px); }
+code { font-family: "JetBrains Mono", monospace; font-size: .88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
+
+pre {
+  background: var(--code-bg); color: var(--code-fg); font-family: "JetBrains Mono", monospace;
+  font-size: clamp(13px, 1.15vw, 16px); line-height: 1.55; padding: 18px 22px; border-radius: 10px;
+  overflow-x: auto; margin: 0; max-width: 100%;
+}
+pre code { background: none; padding: 0; font-size: inherit; }
+.k { color: var(--c-key); } .s { color: var(--c-str); } .c { color: var(--c-com); font-style: italic; } .f { color: var(--c-fn); }
+.file { font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--muted); margin: 0 0 6px; }
+
+.grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.two { display: grid; gap: 28px; grid-template-columns: 1fr 1fr; align-items: start; }
+@media (max-width: 800px) { .two { grid-template-columns: 1fr; } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; }
+.card p { font-size: 17px; margin: 0; }
+.emoji { font-size: 30px; margin-bottom: 6px; }
+
+table { border-collapse: collapse; width: 100%; font-size: clamp(15px, 1.4vw, 19px); }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: .85em; text-transform: uppercase; letter-spacing: .04em; }
+
+.steps { counter-reset: paso; list-style: none; padding: 0; margin: 0; }
+.steps li { counter-increment: paso; position: relative; padding-left: 48px; margin-bottom: 14px; }
+.steps li::before {
+  content: counter(paso); position: absolute; left: 0; top: 2px; width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 16px;
+}
+.tip { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: 12px 16px; border-radius: 0 8px 8px 0; margin-top: 20px; }
+.tip p { margin: 0; font-size: 18px; }
+
+.flow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 8px 0 20px; }
+.flow .box { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; font-weight: 600; }
+.flow .box.hl { border-color: var(--accent); color: var(--accent); }
+.flow .arrow { color: var(--muted); font-size: 22px; }
+
+nav {
+  position: fixed; left: 0; right: 0; bottom: 0; height: 52px; display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; background: var(--bg); border-top: 1px solid var(--line); z-index: 2;
+}
+nav button { background: var(--card); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; padding: 6px 14px; font: inherit; cursor: pointer; }
+nav button:hover { border-color: var(--accent); }
+.bar { position: fixed; top: 0; left: 0; height: 3px; background: var(--accent); transition: width .25s; z-index: 2; }
+#count { color: var(--muted); font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+
+<!-- 1. Portada -->
+<section class="slide">
+  <div class="kicker">Claude Code · desde cero</div>
+  <h1>Mods de Claude Code</h1>
+  <p class="big muted">Qué son, cómo funcionan, cómo se crean, cómo se prueban y cómo se instalan.</p>
+</section>
+
+<!-- 2. Qué es -->
+<section class="slide">
+  <div class="kicker">La idea</div>
+  <h2>¿Qué es un mod?</h2>
+  <p class="big">Un <strong>plugin con funciones</strong> que se enganchan a lo que pasa dentro de Claude Code.</p>
+  <div class="flow">
+    <div class="box">Escribes un mensaje</div><div class="arrow">→</div>
+    <div class="box">Claude usa una herramienta</div><div class="arrow">→</div>
+    <div class="box">Termina el turno</div>
+  </div>
+  <p>En cada uno de esos momentos (eventos), tu mod puede <strong>mirar</strong>, <strong>cambiar</strong> o <strong>bloquear</strong> lo que pasa.</p>
+  <div class="tip"><p>Analogía: es como un guardia en una puerta. Cada cosa que pasa por ahí, el guardia la ve y decide si la deja pasar, la cambia o la detiene.</p></div>
+</section>
+
+<!-- 3. Qué puede hacer -->
+<section class="slide">
+  <div class="kicker">Lo que se puede hacer</div>
+  <h2>Un mod puede…</h2>
+  <div class="grid">
+    <div class="card"><div class="emoji">📊</div><h3>Barra de estado</h3><p>Mostrar un texto fijo abajo: <code>$.ui.status()</code></p></div>
+    <div class="card"><div class="emoji">🔔</div><h3>Avisos (toast)</h3><p>Un mensaje que aparece unos segundos: <code>$.ui.toast()</code></p></div>
+    <div class="card"><div class="emoji">⛔</div><h3>Bloquear</h3><p>Impedir que Claude haga algo: <code>{ deny }</code></p></div>
+    <div class="card"><div class="emoji">❓</div><h3>Preguntarte</h3><p>Mostrarte opciones y esperar tu respuesta: <code>$.ui.ask()</code></p></div>
+    <div class="card"><div class="emoji">🧱</div><h3>Dibujar</h3><p>Una franja encima del prompt o un panel lateral.</p></div>
+    <div class="card"><div class="emoji">⌨️</div><h3>Comandos propios</h3><p>Crear tus propios <code>/comandos</code>.</p></div>
+  </div>
+</section>
+
+<!-- 4. Anatomía -->
+<section class="slide">
+  <div class="kicker">Anatomía</div>
+  <h2>Un mod son 3 archivos</h2>
+  <div class="two">
+    <pre><code>cronometro/
+├── .claude-plugin/
+│   └── plugin.json     <span class="c">← nombre y descripción</span>
+└── hooks/
+    ├── hooks.json      <span class="c">← qué archivo cargar</span>
+    ├── register.ts     <span class="c">← el código</span>
+    └── register.test.ts <span class="c">← sus pruebas (opcional)</span></code></pre>
+    <div>
+      <p><strong>plugin.json</strong> → la "cédula" del mod.</p>
+      <p><strong>hooks.json</strong> → le dice a Claude Code dónde está el código.</p>
+      <p><strong>register.ts</strong> → lo que hace el mod. Aquí está todo lo interesante.</p>
+      <p class="muted">Se escribe en TypeScript. Si dibuja algo en pantalla, usa <code>.tsx</code>.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 5. La fórmula -->
+<section class="slide">
+  <div class="kicker">La fórmula</div>
+  <h2>Todo mod se ve así</h2>
+  <pre><code><span class="k">export const</span> <span class="f">register</span>: Register = on => {
+  on(<span class="s">'evento'</span>, ($, e, next) => {
+    <span class="c">// $    → las herramientas (mostrar avisos, preguntar, guardar datos…)</span>
+    <span class="c">// e    → lo que está pasando (el mensaje, el comando, etc.)</span>
+    <span class="c">// next → "déjalo seguir"</span>
+    <span class="k">return</span> next(e)
+  })
+}</code></pre>
+  <div class="tip"><p>Regla de oro: si no haces nada especial, termina con <code>return next(e)</code> para que todo siga normal.</p></div>
+</section>
+
+<!-- 6. Eventos -->
+<section class="slide">
+  <div class="kicker">Los momentos</div>
+  <h2>Eventos que usamos</h2>
+  <table>
+    <tr><th>Evento</th><th>Cuándo pasa</th><th>Lo usamos en</th></tr>
+    <tr><td><code>session.start</code></td><td>Al abrir Claude Code</td><td>mis-notas (registrar comandos)</td></tr>
+    <tr><td><code>prompt.submit</code></td><td>Cuando envías un mensaje</td><td>cronometro</td></tr>
+    <tr><td><code>tool.call</code></td><td>Cuando Claude va a usar una herramienta</td><td>cronometro, viernes, dependencias</td></tr>
+    <tr><td><code>turn.complete</code></td><td>Cuando Claude termina de responder</td><td>cronometro</td></tr>
+    <tr><td><code>command.run</code></td><td>Cuando escribes un <code>/comando</code> del mod</td><td>mis-notas</td></tr>
+    <tr><td><code>prompt.compose</code></td><td>Cuando se arman las instrucciones de Claude</td><td>mis-notas</td></tr>
+    <tr><td><code>ui.render</code></td><td>Cuando se dibuja la pantalla</td><td>aprobar-dependencias (franja)</td></tr>
+  </table>
+</section>
+
+<!-- 7. Tres respuestas -->
+<section class="slide">
+  <div class="kicker">Decidir</div>
+  <h2>Tres maneras de responder</h2>
+  <div class="grid">
+    <div class="card"><div class="emoji">✅</div><h3>Dejar pasar</h3><pre><code><span class="k">return</span> next(e)</code></pre><p style="margin-top:10px">Todo sigue igual.</p></div>
+    <div class="card"><div class="emoji">✏️</div><h3>Cambiar</h3><pre><code><span class="k">return</span> next({ ...e,
+  command: nuevo })</code></pre><p style="margin-top:10px">Sigue, pero con algo distinto.</p></div>
+    <div class="card"><div class="emoji">⛔</div><h3>Bloquear</h3><pre><code><span class="k">return</span> {
+  deny: <span class="s">'Motivo'</span> }</code></pre><p style="margin-top:10px">Se detiene y Claude lee el motivo.</p></div>
+  </div>
+</section>
+
+<!-- 8. Crear desde cero: pasos -->
+<section class="slide">
+  <div class="kicker">Ejemplo 1 · crear desde cero</div>
+  <h2>Mod <code>cronometro</code>: el plan</h2>
+  <p>Queremos saber <strong>cuánto tardó Claude</strong> y <strong>cuántas herramientas usó</strong> en cada respuesta.</p>
+  <ol class="steps">
+    <li>Al enviar un mensaje (<code>prompt.submit</code>) → pongo el contador en 0.</li>
+    <li>Cada vez que Claude usa una herramienta (<code>tool.call</code>) → sumo 1 y lo muestro abajo.</li>
+    <li>Al terminar (<code>turn.complete</code>) → muestro el resumen y un aviso.</li>
+  </ol>
+</section>
+
+<!-- 9. Probar -->
+<section class="slide">
+  <div class="kicker">Probar</div>
+  <h2>Tres maneras de probarlo</h2>
+  <table>
+    <tr><th>Manera</th><th>Comando</th><th>Para qué</th></tr>
+    <tr><td>1. Revisar</td><td><code>claude plugin validate ./plugins/cronometro</code></td><td>Que no tenga errores de forma</td></tr>
+    <tr><td>2. Pruebas automáticas</td><td><code>claude plugin test ./plugins/cronometro</code></td><td>Que haga lo que debe, sin abrir Claude</td></tr>
+    <tr><td>3. Usarlo de verdad</td><td><code>claude --plugin-dir ./plugins/cronometro</code></td><td>Abre Claude Code con el mod cargado (sin instalarlo)</td></tr>
+  </table>
+  <div class="tip"><p>Con la opción 3, cada vez que guardas el archivo, el mod se recarga solo. Edita, guarda y vuelve a probar.</p></div>
+</section>
+
+<!-- 10. Guardar datos -->
+<section class="slide">
+  <div class="kicker">Guardar datos</div>
+  <h2>¿Dónde guarda cosas un mod?</h2>
+  <div class="grid">
+    <div class="card"><div class="emoji">🧠</div><h3>Variable normal</h3><p><code>let tools = 0</code><br>Se pierde al recargar el mod. Bien para contadores rápidos.</p></div>
+    <div class="card"><div class="emoji">📋</div><h3><code>$.state</code></h3><p>Vive mientras dure la sesión. Si cambia, la pantalla se redibuja sola. (aprobar-dependencias)</p></div>
+    <div class="card"><div class="emoji">💾</div><h3><code>$.store</code></h3><p>Se guarda en disco y sobrevive entre sesiones. (mis-notas)</p></div>
+  </div>
+</section>
+
+<!-- 11. Compartir -->
+<section class="slide">
+  <div class="kicker">Compartir</div>
+  <h2>De carpeta a "tienda" (marketplace)</h2>
+  <p>Un solo archivo convierte tu repositorio en una tienda de mods:</p>
+  <div class="two">
+    <div>
+      <p class="file">.claude-plugin/marketplace.json</p>
+      <pre><code>{
+  <span class="k">"name"</span>: <span class="s">"claude-mods"</span>,
+  <span class="k">"owner"</span>: { <span class="k">"name"</span>: <span class="s">"alexyslozada"</span> },
+  <span class="k">"plugins"</span>: [
+    {
+      <span class="k">"name"</span>: <span class="s">"cronometro"</span>,
+      <span class="k">"source"</span>: <span class="s">"./plugins/cronometro"</span>,
+      <span class="k">"description"</span>: <span class="s">"Mide cada turno"</span>
+    }
+  ]
+}</code></pre>
+    </div>
+    <div>
+      <ol class="steps">
+        <li>Crea el archivo en la raíz del repo.</li>
+        <li>Añade una entrada por cada mod.</li>
+        <li>Sube el repo a GitHub (<code>git push</code>).</li>
+      </ol>
+      <p class="muted">Listo: cualquiera puede instalar tus mods con una línea.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 12. Instalar -->
+<section class="slide">
+  <div class="kicker">Instalar</div>
+  <h2>Instalar un mod</h2>
+  <p>Dentro de Claude Code, en la terminal:</p>
+  <pre><code>/plugin install cronometro --marketplace alexyslozada/claude-mods</code></pre>
+  <ol class="steps" style="margin-top:20px">
+    <li>Pregunta si añade la tienda → responde <code>y</code>.</li>
+    <li>Elige el alcance: <code>user</code> (todas tus sesiones), <code>project</code> (este proyecto, compartido) o <code>local</code> (este proyecto, solo tú).</li>
+    <li>Sale <em>"Installed cronometro. Plugin is now active."</em> → ya funciona, sin reiniciar.</li>
+  </ol>
+  <p class="muted">Para los demás, cambia el nombre: <code>viernes-sin-deploy</code>, <code>aprobar-dependencias</code>, <code>mis-notas</code>.</p>
+</section>
+
+<!-- 13. Administrar -->
+<section class="slide">
+  <div class="kicker">Administrar</div>
+  <h2>Ver, apagar y quitar</h2>
+  <table>
+    <tr><th>Quiero…</th><th>Comando</th></tr>
+    <tr><td>Ver todo en un menú</td><td><code>/plugin</code></td></tr>
+    <tr><td>Ver qué tengo instalado</td><td><code>claude plugin list</code></td></tr>
+    <tr><td>Apagarlo sin borrarlo</td><td><code>claude plugin disable cronometro@claude-mods</code></td></tr>
+    <tr><td>Volver a prenderlo</td><td><code>claude plugin enable cronometro@claude-mods</code></td></tr>
+    <tr><td>Desinstalarlo</td><td><code>claude plugin uninstall cronometro@claude-mods</code></td></tr>
+    <tr><td>Quitar la tienda</td><td><code>claude plugin marketplace remove claude-mods</code></td></tr>
+    <tr><td>Traer la versión nueva</td><td><code>claude plugin update cronometro@claude-mods</code></td></tr>
+  </table>
+</section>
+
+<!-- 14. Seguridad -->
+<section class="slide">
+  <div class="kicker">Ojo</div>
+  <h2>Un mod tiene tus mismos permisos</h2>
+  <p class="big">Corre en tu máquina, con los mismos permisos que Claude Code.</p>
+  <ul>
+    <li>Instala solo mods de gente en la que confías.</li>
+    <li>Lee el código antes (son archivos cortos).</li>
+    <li>Si un mod "guardián" falla, decide qué hacer con <code>.catch()</code>: dejar pasar o bloquear.</li>
+  </ul>
+</section>
+
+
+<nav>
+  <button id="prev" aria-label="Anterior">←</button>
+  <span id="count"></span>
+  <span>
+    <button id="theme" aria-label="Cambiar tema">◐</button>
+    <button id="next" aria-label="Siguiente">→</button>
+  </span>
+</nav>
+
+<script>
+const slides = [...document.querySelectorAll('.slide')]
+let i = 0
+try { i = Math.min(Number(location.hash.slice(1)) - 1 || 0, slides.length - 1) } catch {}
+
+function show(n) {
+  i = Math.max(0, Math.min(n, slides.length - 1))
+  slides.forEach((s, k) => s.classList.toggle('on', k === i))
+  document.getElementById('count').textContent = `${i + 1} / ${slides.length}`
+  document.getElementById('bar').style.width = `${((i + 1) / slides.length) * 100}%`
+  history.replaceState(null, '', `#${i + 1}`)
+}
+
+document.addEventListener('keydown', e => {
+  if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(i + 1) }
+  if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(i - 1) }
+  if (e.key === 'Home') show(0)
+  if (e.key === 'End') show(slides.length - 1)
+})
+document.getElementById('next').onclick = () => show(i + 1)
+document.getElementById('prev').onclick = () => show(i - 1)
+document.getElementById('theme').onclick = () => {
+  const root = document.documentElement
+  const dark = root.dataset.theme ? root.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
+  root.dataset.theme = dark ? 'light' : 'dark'
+}
+
+show(i)
+</script>
+</body>
+</html>
