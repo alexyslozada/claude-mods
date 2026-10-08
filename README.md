@@ -14,6 +14,7 @@ Un **mod** es un plugin con funciones que se enganchan a los eventos de Claude C
 | [`viernes-sin-deploy`](plugins/viernes-sin-deploy) | Bloquea `git push` los viernes 🍻 | Bloquear con `{ deny }` |
 | [`aprobar-dependencias`](plugins/aprobar-dependencias) | Te pregunta antes de instalar paquetes (`npm`, `pip`, `go get`…), te deja elegir cuáles e instala solo esos | `$.ui.ask`, reescribir el comando, `$.state`, franja con `ui.render` |
 | [`mis-notas`](plugins/mis-notas) | Guardas notas con `/nota` y Claude las usa como tu contexto y tus preferencias en todas las sesiones | Comandos propios, `$.store`, `prompt.compose` |
+| [`contador-tokens`](plugins/contador-tokens) | Muestra en la barra de estado los tokens del contexto y cuánto costaría la sesión vía API, y un toast con lo que sumó cada respuesta | `session.start`, `$.session.usage`, `$.ui.status`, `$.ui.toast` |
 
 ## Instalación
 
@@ -29,6 +30,7 @@ Responde `y` para añadir el marketplace y elige el alcance (`user` para todas t
 /plugin install viernes-sin-deploy --marketplace alexyslozada/claude-mods
 /plugin install aprobar-dependencias --marketplace alexyslozada/claude-mods
 /plugin install mis-notas --marketplace alexyslozada/claude-mods
+/plugin install contador-tokens --marketplace alexyslozada/claude-mods
 ```
 
 ## Uso

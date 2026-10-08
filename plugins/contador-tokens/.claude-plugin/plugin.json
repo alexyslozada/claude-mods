@@ -1,1 +1,8 @@
-{ "name": "contador-tokens", "version": "0.1.0", "description": "Muestra los tokens del contexto en la barra de estado y un toast con los tokens de cada respuesta" }
+{
+  "name": "contador-tokens",
+  "version": "0.1.0",
+  "description": "Muestra los tokens del contexto y el costo de la API en la barra de estado, y un toast con lo que sumó cada respuesta",
+  "author": {
+    "name": "alexyslozada"
+  }
+}
