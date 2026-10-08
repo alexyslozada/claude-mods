@@ -24,6 +24,11 @@
       "name": "mis-notas",
       "source": "./plugins/mis-notas",
       "description": "Guarda notas con /nota y Claude las usa como tu contexto y preferencias"
+    },
+    {
+      "name": "contador-tokens",
+      "source": "./plugins/contador-tokens",
+      "description": "Muestra los tokens del contexto y el costo de la API en la barra de estado"
     }
   ]
 }

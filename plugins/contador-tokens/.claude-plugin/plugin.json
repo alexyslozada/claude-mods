@@ -1,0 +1,1 @@
+{ "name": "contador-tokens", "version": "0.1.0", "description": "Muestra los tokens del contexto en la barra de estado y un toast con los tokens de cada respuesta" }
